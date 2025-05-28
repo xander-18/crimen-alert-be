@@ -65,6 +65,69 @@ class UserReportsController extends Controller
         ], 200);
     }
 
+    public function oneReportId($id) {
+        $report = UserReports::with(['user', 'comments.user'])
+            ->withCount([
+                'votes as votes_conforme' => function ($query) {
+                    $query->where('vote', 'conforme');
+                },
+                'votes as votes_no_conforme' => function ($query) {
+                    $query->where('vote', 'no_conforme');
+                },
+                'comments as comments_count'
+            ])->find($id);
+    
+        if (!$report) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Reporte no encontrado',
+            ], 404);
+        }
+    
+        $reportData = [
+            'id' => $report->id,
+            'titulo' => $report->titulo,
+            'estado' => $report->estado ?? null,
+            'fecha_hora_report' => $report->fecha_hora_report,
+            'direccion' => $report->direccion,
+            'descripcion' => $report->descripcion,
+            'latitude' => $report->latitude,
+            'longitude' => $report->longitude,
+            'user' => [
+                'id' => $report->user->id ?? null,
+                'name' => $report->user->name ?? null,
+                'image_profile' => $report->user && $report->user->image_profile
+                    ? asset('storage/' . $report->user->image_profile)
+                    : null,
+            ],
+            'image' => $report->image ? asset($report->image) : null,
+            'video' => $report->video ? asset($report->video) : null,
+            'votes_conforme' => $report->votes_conforme,
+            'votes_no_conforme' => $report->votes_no_conforme,
+            'comments_count' => $report->comments_count,
+            'comments' => $report->comments->map(function ($comment) {
+                return [
+                    'id' => $comment->id,
+                    'user' => [
+                        'id' => $comment->user->id ?? null,
+                        'name' => $comment->user->name ?? null,
+                        'image_profile' => $comment->user && $comment->user->image_profile
+                            ? asset('storage/' . $comment->user->image_profile)
+                            : null,
+                    ],
+                    'comentario' => $comment->comentario,
+                    'created_at' => $comment->created_at,
+                ];
+            }),
+        ];
+    
+        return response()->json([
+            'status' => 200,
+            'message' => 'Detalle del reporte',
+            'data' => $reportData,
+        ], 200);
+    }
+
     public function userReportCreate(Request $request) {
 
         $validation = $this->imageService->validateFile($request, [

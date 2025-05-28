@@ -1,0 +1,23 @@
+✅ OPCIÓN 1: Clonar desde GitHub dentro del Dockerfile
+Puedes crear un Dockerfile para el servicio frontend que clone automáticamente el repositorio y construya el frontend desde la subcarpeta.
+
+📄 Dockerfile.frontend
+Crea este archivo en la raíz de tu proyecto (Dockerfile.frontend):
+
+dockerfile
+Copiar
+Editar
+FROM node:18-alpine
+
+# Instalar git para clonar el repositorio
+RUN apk add --no-cache git
+
+# Clonar solo la carpeta necesaria del repositorio
+WORKDIR /app
+RUN git clone --depth=1 https://github.com/redigb/crime-alert-app-front.git repo
+WORKDIR /app/repo/frontend-web
+
+# Instalar dependencias y arrancar
+RUN npm install
+EXPOSE 3000
+CMD ["npm", "run", "dev"]

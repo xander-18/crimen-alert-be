@@ -3,7 +3,20 @@ version: '3.8'
 services:
 
   # Frontend service // Falta!!!!
-
+ frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: frontend_app
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+    networks:
+      - laravel
+    depends_on:
+      - app
+      
   app:
     build:
       context: .

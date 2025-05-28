@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Reports - user - alert
     Route::get('/reports', [UserReportsController::class, 'reportsList']);
     Route::post('/reports/create', [UserReportsController::class, 'userReportCreate']);
+    Route::get('/reports/{id}', [UserReportsController::class, 'oneReportId']);
+    /// falta UPDATE Y dELETE
 
     // Votos en reportes
     Route::get('/report-votes/{report_id}', [ReportVoteController::class, 'listVotos']); // Listar votos de un reporte
@@ -34,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/{id}', [UserReportsController::class, 'destroy']); // Eliminar reporte
 });*/
 
-// Rutas - Auth
+// Rutas - Auth - COMO PUBLICAS
 Route::prefix('auth')->group(function () {
     Route::post('/login', [UserController::class, 'login']);
     Route::post('/register', [UserController::class, 'register']);
